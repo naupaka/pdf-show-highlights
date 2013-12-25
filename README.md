@@ -9,6 +9,9 @@ Installation
 
 Be sure that you have all needed packages installed. You need `gcc` compiler, and package `poppler` (Gentoo) or `libpoppler-glib-dev` (Debian). 
 
+If you want to learn more about the `poppler` methods for C, [this is
+the best site I've come across](https://developer.gnome.org/poppler/unstable/PopplerAnnot.html#PopplerAnnotText).
+
 It also works on OS X (manually installing dependencies through homebrew), although you may need to be very pedantic on telling the compiler where to find stuff before running make, e.g.:
 
 ```sh
