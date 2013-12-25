@@ -20,6 +20,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <poppler/glib/poppler.h>
+#include <string.h>
 
 int main (int argc, char *argv[]) {
 
@@ -35,6 +36,12 @@ int main (int argc, char *argv[]) {
         gchar *filename, *uri;
         filename = realpath (argv[1], NULL);
         uri = g_filename_to_uri (filename, NULL, NULL);
+        
+        /*Extract filename from full path*/
+        char *path_to_file = argv[1];
+        /*strrchr() finds the last occurance of the character '/'*/
+        char *pLastSlash = strrchr(path_to_file, '/');
+        char *basename = pLastSlash ? pLastSlash + 1 : path_to_file;
 
         PopplerDocument *document;
         document = poppler_document_new_from_file (uri, NULL, NULL);
@@ -73,16 +80,31 @@ int main (int argc, char *argv[]) {
                         pdf_selection.y2 = height - selection.y2;
 
                         gchar *text;
+                        /* works better with POPPLER_SELECTION_LINE instead
+                         * of POPPLER_SELECTION_WORD when used on multi-column text */ 
                         text = poppler_page_get_selected_text
-                            (page, POPPLER_SELECTION_WORD, &pdf_selection);
-                        g_printf ("\"%s\" (p. %d)\n\n", text, index+1);
+                            (page, POPPLER_SELECTION_LINE, &pdf_selection);
+                        /*Remove linebreaks in the text*/
+                        for(int x = 0; x < strlen(text); x++) { 
+                            if (text[x] == '\n') {
+                                text[x] = ' ';
+                            }
+                        } 
+                        g_printf ("HIGHLIGHT (%s p. %d):\n\"%s\"\n\n", basename, index+1, text);
                         g_free (text);
 
                         poppler_rectangle_free (&selection);
                         poppler_rectangle_free (&pdf_selection);
                     }
-               }
+                    /*Also pull out text notes */
+                    else if (type == POPPLER_ANNOT_TEXT) {
+                        gchar *text;
+                        text = poppler_annot_get_contents (annot);
+                        g_printf("NOTE (%s p. %d):\n\"%s\"\n\n", basename, index+1, text);
+                        g_free(text);
+                    }
 
+                }
                 poppler_page_free_annot_mapping (list);
                 poppler_page_free_annot_mapping (l);
                 g_object_unref (G_OBJECT (page));
@@ -92,3 +114,4 @@ int main (int argc, char *argv[]) {
         }
     }
 }
+
