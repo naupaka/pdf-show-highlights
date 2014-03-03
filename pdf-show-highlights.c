@@ -90,7 +90,7 @@ int main (int argc, char *argv[]) {
                                 text[x] = ' ';
                             }
                         } 
-                        g_printf ("HIGHLIGHT (%s p. %d):\n\"%s\"\n\n", basename, index+1, text);
+                        g_printf ("HIGHLIGHT (%s p. %d):\n\"%s\"\n----\n", basename, index+1, text);
                         g_free (text);
 
                         poppler_rectangle_free (&selection);
@@ -100,7 +100,7 @@ int main (int argc, char *argv[]) {
                     else if (type == POPPLER_ANNOT_TEXT) {
                         gchar *text;
                         text = poppler_annot_get_contents (annot);
-                        g_printf("NOTE (%s p. %d):\n\"%s\"\n\n", basename, index+1, text);
+                        g_printf("NOTE (%s p. %d):\n\"%s\"\n----\n", basename, index+1, text);
                         g_free(text);
                     }
 
